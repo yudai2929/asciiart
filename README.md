@@ -2,6 +2,10 @@
 
 The `asciiart` package is a Go library for generating ASCII art from images.
 
+## What is ASCII art?
+
+ASCII art is a form of artistic expression where images are created using only the characters from the ASCII standard, which includes letters, numbers, and symbols. Originating in the early days of computing, it transforms plain text into visual designs, ranging from simple line art to complex compositions. ASCII art remains popular for its unique aesthetic and is used in various digital platforms and software environments to add creativity and visual interest.
+
 ## Features
 
 - Supports JPEG and PNG image formats.
@@ -14,9 +18,9 @@ The `asciiart` package is a Go library for generating ASCII art from images.
 go get -u github.com/yudai2929/asciiart
 ```
 
-# Usage
+## Usage
 
-## Generate ASCII Art from an Image File
+### Generate ASCII Art from an Image File
 
 ```go
 package main
@@ -43,7 +47,7 @@ func main() {
 }
 ```
 
-## Generate ASCII Art from a Base64 Encoded Image
+### Generate ASCII Art from a Base64 Encoded Image
 
 ```go
 asciiArt, err := asciiart.GenerateFromBase64(encodedString, asciiart.StdEncoding)
@@ -53,10 +57,10 @@ if err != nil {
 fmt.Println(asciiArt)
 ```
 
-# Contributions
+## Contributions
 
 Contributions are welcome! Please feel free to submit pull requests, report bugs, or suggest new features.
 
-# License
+## License
 
 This project is licensed under the MIT License - see the [LICENSE](https://github.com/yudai2929/asciiart/blob/main/LICENSE) file for details.
