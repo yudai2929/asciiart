@@ -9,18 +9,16 @@ import (
 	"image/jpeg"
 	"image/png"
 	"io"
-	"os"
+	"strings"
 )
+
+func init() {
+	image.RegisterFormat("png", "png", png.Decode, png.DecodeConfig)
+	image.RegisterFormat("jpeg", "jpeg", jpeg.Decode, jpeg.DecodeConfig)
+}
 
 const (
 	aaSet = "MWN$@%#&B89EGA6mK5HRkbYT43V0JL7gpaseyxznocv?jIftr1li*=-~^`':;,. "
-)
-
-type mimeType string
-
-const (
-	mimeTypePNG  mimeType = "png"
-	mimeTypeJPEG mimeType = "jpeg"
 )
 
 // EncodingType represents the encoding type of the base64 encoded image.
@@ -33,14 +31,9 @@ const (
 	URLEncoding EncodingType = "url"
 )
 
-// Generate generates ASCII art from an image file.
-func Generate(filePath string) (string, error) {
-	file, err := os.Open(filePath)
-	if err != nil {
-		return "", err
-	}
-
-	img, _, err := image.Decode(file)
+// Generate generates ASCII art from an image.
+func Generate(reader io.Reader) (string, error) {
+	img, _, err := image.Decode(reader)
 	if err != nil {
 		return "", err
 	}
@@ -50,7 +43,7 @@ func Generate(filePath string) (string, error) {
 
 // GenerateFromBase64 generates ASCII art from a base64 encoded image.
 func GenerateFromBase64(encodedString string, encodingType EncodingType) (string, error) {
-	base64Str, imageType, err := extractBase64Data(encodedString)
+	base64Str, err := extractBase64Data(encodedString)
 	if err != nil {
 		return "", err
 	}
@@ -70,49 +63,22 @@ func GenerateFromBase64(encodedString string, encodingType EncodingType) (string
 		return "", err
 	}
 
-	img, err := toImage(bytes.NewReader(imageBytes), imageType)
-	if err != nil {
-		return "", err
-	}
-
-	return toASCII(img), nil
+	return Generate(bytes.NewReader(imageBytes))
 }
 
-func extractBase64Data(encodedString string) (string, mimeType, error) {
+func extractBase64Data(encodedString string) (string, error) {
 	const prefix = "data:image/"
+	if !strings.HasPrefix(encodedString, prefix) {
+		return "", fmt.Errorf("invalid base64 encoded string")
+	}
+
 	const suffix = ";base64,"
-
-	if len(encodedString) < len(prefix)+len(suffix) {
-		return "", "", fmt.Errorf("invalid base64 encoded string")
+	base64Idx := strings.Index(encodedString, suffix)
+	if base64Idx == -1 {
+		return "", fmt.Errorf("invalid base64 encoded string")
 	}
 
-	mimeStr := encodedString[len(prefix) : len(prefix)+3]
-	if !isValidMimeType(mimeStr) {
-		return "", "", fmt.Errorf("unsupported image type: %s", mimeStr)
-	}
-	base64Str := encodedString[len(prefix)+3+len(suffix):]
-	return base64Str, mimeType(mimeStr), nil
-}
-
-func isValidMimeType(mimeStr string) bool {
-	switch mimeStr {
-	case string(mimeTypePNG), string(mimeTypeJPEG):
-		return true
-	default:
-		return false
-	}
-}
-
-func toImage(reader io.Reader, imageType mimeType) (img image.Image, err error) {
-	switch imageType {
-	case mimeTypePNG:
-		img, err = png.Decode(reader)
-	case mimeTypeJPEG:
-		img, err = jpeg.Decode(reader)
-	default:
-		return nil, fmt.Errorf("unsupported image type: %s", imageType)
-	}
-	return img, err
+	return encodedString[base64Idx+len(suffix):], nil
 }
 
 func toASCII(image image.Image) string {

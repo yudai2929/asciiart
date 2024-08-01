@@ -3,6 +3,7 @@ package main
 import (
 	"fmt"
 	"log"
+	"os"
 
 	"github.com/yudai2929/asciiart"
 )
@@ -13,8 +14,13 @@ const (
 )
 
 func main() {
-	asciiArt, err := asciiart.GenerateFromBase64(encodedString, asciiart.StdEncoding)
-	// asciiArt, err := asciiart.Generate(filePath)
+	file, err := os.Open(filePath)
+	if err != nil {
+		log.Fatalf("Failed to open file: %v", err)
+	}
+	asciiArt, err := asciiart.Generate(file)
+
+	// asciiArt, err := asciiart.GenerateFromBase64(encodedString, asciiart.StdEncoding)
 	if err != nil {
 		log.Fatalf("Failed to generate ASCII art: %v", err)
 	}
