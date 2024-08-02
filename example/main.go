@@ -1,0 +1,27 @@
+package main
+
+import (
+	"fmt"
+	"log"
+	"os"
+
+	"github.com/yudai2929/asciiart"
+)
+
+const (
+	filePath = "assets/gopher.png"
+)
+
+func main() {
+	file, err := os.Open(filePath)
+	if err != nil {
+		log.Fatalf("Failed to open file: %v", err)
+	}
+
+	asciiArt, err := asciiart.Generate(file, asciiart.WithWidth(50))
+	if err != nil {
+		log.Fatalf("Failed to generate ASCII art: %v", err)
+	}
+
+	fmt.Println(asciiArt)
+}
