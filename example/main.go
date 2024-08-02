@@ -9,7 +9,7 @@ import (
 )
 
 const (
-	filePath = "assets/example.jpg"
+	filePath = "assets/gopher.png"
 )
 
 func main() {
@@ -18,7 +18,7 @@ func main() {
 		log.Fatalf("Failed to open file: %v", err)
 	}
 
-	asciiArt, err := asciiart.Generate(file, asciiart.WithWidth(200))
+	asciiArt, err := asciiart.Generate(file, asciiart.WithWidth(50))
 	if err != nil {
 		log.Fatalf("Failed to generate ASCII art: %v", err)
 	}
