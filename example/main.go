@@ -9,7 +9,7 @@ import (
 )
 
 const (
-	filePath = "assets/input.png"
+	filePath = "assets/example.jpg"
 )
 
 func main() {
@@ -17,10 +17,11 @@ func main() {
 	if err != nil {
 		log.Fatalf("Failed to open file: %v", err)
 	}
-	asciiArt, err := asciiart.Generate(file, asciiart.WithWidth(50))
 
+	asciiArt, err := asciiart.Generate(file, asciiart.WithWidth(200))
 	if err != nil {
 		log.Fatalf("Failed to generate ASCII art: %v", err)
 	}
+
 	fmt.Println(asciiArt)
 }
