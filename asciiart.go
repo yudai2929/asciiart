@@ -67,6 +67,14 @@ func Generate(reader io.Reader, opts ...Option) (string, error) {
 		opt(&o)
 	}
 
+	if o.width < 50 || o.width > 200 {
+		return "", fmt.Errorf("width must be between 50 and 200")
+	}
+
+	if len(o.aaSet) < 4 || len(o.aaSet) > 64 {
+		return "", fmt.Errorf("ASCII art set must be between 4 and 64 characters")
+	}
+
 	img, _, err := image.Decode(reader)
 	if err != nil {
 		return "", err
