@@ -10,6 +10,8 @@ import (
 	"image/png"
 	"io"
 	"strings"
+
+	"golang.org/x/image/draw"
 )
 
 func init() {
@@ -32,17 +34,21 @@ const (
 )
 
 // Generate generates ASCII art from an image.
-func Generate(reader io.Reader) (string, error) {
+func Generate(reader io.Reader, width int) (string, error) {
 	img, _, err := image.Decode(reader)
 	if err != nil {
 		return "", err
 	}
 
-	return toASCII(img), nil
+	// Calculate the height based on the newWidth and original aspect ratio
+	newWidth, newHeight := calculateDimensions(img, width)
+	resizedImg := resizeImage(img, newWidth, newHeight)
+
+	return toASCII(resizedImg), nil
 }
 
 // GenerateFromBase64 generates ASCII art from a base64 encoded image.
-func GenerateFromBase64(encodedString string, encodingType EncodingType) (string, error) {
+func GenerateFromBase64(encodedString string, encodingType EncodingType, width int) (string, error) {
 	base64Str, err := extractBase64Data(encodedString)
 	if err != nil {
 		return "", err
@@ -63,7 +69,7 @@ func GenerateFromBase64(encodedString string, encodingType EncodingType) (string
 		return "", err
 	}
 
-	return Generate(bytes.NewReader(imageBytes))
+	return Generate(bytes.NewReader(imageBytes), width)
 }
 
 func extractBase64Data(encodedString string) (string, error) {
@@ -79,6 +85,26 @@ func extractBase64Data(encodedString string) (string, error) {
 	}
 
 	return encodedString[base64Idx+len(suffix):], nil
+}
+
+func resizeImage(img image.Image, newWidth, newHeight int) image.Image {
+	dst := image.NewRGBA(image.Rect(0, 0, newWidth, newHeight))
+	draw.CatmullRom.Scale(dst, dst.Bounds(), img, img.Bounds(), draw.Over, nil)
+	return dst
+}
+
+func calculateDimensions(img image.Image, newWidth int) (int, int) {
+	bounds := img.Bounds()
+	originalWidth := bounds.Dx()
+	originalHeight := bounds.Dy()
+
+	if newWidth == 0 {
+		return originalWidth, originalHeight
+	}
+
+	newHeight := int(float64(newWidth) * float64(originalHeight) / float64(originalWidth))
+
+	return newWidth, newHeight
 }
 
 func toASCII(image image.Image) string {
