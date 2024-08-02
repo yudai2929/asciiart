@@ -17,7 +17,7 @@ func main() {
 	if err != nil {
 		log.Fatalf("Failed to open file: %v", err)
 	}
-	asciiArt, err := asciiart.Generate(file, 100)
+	asciiArt, err := asciiart.Generate(file, asciiart.WithWidth(50))
 
 	if err != nil {
 		log.Fatalf("Failed to generate ASCII art: %v", err)
